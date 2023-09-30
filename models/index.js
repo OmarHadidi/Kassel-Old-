@@ -1,9 +1,9 @@
 const { Sequelize, DataTypes, Op } = require("sequelize");
-const defineUser = require("./user.model");
-const defineTodo = require("./todo.model");
-const defineTodoGroup = require("./todo-group.model");
-const defineUserTodoGroup = require("./user-todo-group.model");
-const defineRole = require("./role.model");
+const defineUser = require("./User.model");
+const defineTodo = require("./Todo.model");
+const defineTodoGroup = require("./TodoGroup.model");
+const defineUserTodoGroup = require("./UserTodoGroup.model");
+const defineRole = require("./Role.model");
 require("dotenv").config();
 
 /**
