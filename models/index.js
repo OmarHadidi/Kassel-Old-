@@ -1,24 +1,29 @@
 const { Sequelize, DataTypes, Op } = require("sequelize");
-const defineUser = require("./User.model");
-const defineTodo = require("./Todo.model");
-const defineTodoGroup = require("./TodoGroup.model");
-const defineUserTodoGroup = require("./UserTodoGroup.model");
-const defineRole = require("./Role.model");
 require("dotenv").config();
+
+function getModels(sequelize) {
+    const models = {
+        Todo: require("./Todo.model")(sequelize),
+        TodoGroup: require("./TodoGroup.model")(sequelize),
+        User_TodoGroup: require("./UserTodoGroup.model")(sequelize),
+        User: require("./User.model")(sequelize),
+        Role: require("./Role.model")(sequelize),
+        UserCreds: require("./UserCreds.model")(sequelize),
+    };
+    return models;
+}
 
 /**
  * Defines Sequelize Models
  * @param {Sequelize} sequelize
  */
-async function defineModels(sequelize) {
-    const Todo = defineTodo(sequelize);
-    const TodoGroup = defineTodoGroup(sequelize);
-    const User_TodoGroup = defineUserTodoGroup(sequelize);
-    const User = defineUser(sequelize);
-    const Role = defineRole(sequelize);
+async function setupModels(sequelize) {
+    const { Todo, TodoGroup, User_TodoGroup, User, Role, UserCreds } =
+        getModels(sequelize);
 
-    TodoGroup.hasMany(Todo)
-    Todo.belongsTo(TodoGroup)
+    // Relations
+    TodoGroup.hasMany(Todo);
+    Todo.belongsTo(TodoGroup);
 
     TodoGroup.belongsToMany(User, {
         through: User_TodoGroup,
@@ -33,11 +38,18 @@ async function defineModels(sequelize) {
     Role.hasMany(User_TodoGroup);
     User_TodoGroup.belongsTo(Role);
 
-    await sequelize.sync({ force: true });
+    User.hasOne(UserCreds);
+    UserCreds.belongsTo(User);
+
+    // await sequelize.sync({ force: true });
+    await sequelize.sync();
 }
 
 // To run here
 const sequelize = new Sequelize(process.env.DB_URI);
-sequelize.authenticate().then(() => defineModels(sequelize));
+sequelize.authenticate().then(() => setupModels(sequelize));
 
-module.exports = defineModels;
+module.exports = {
+    setupModels,
+    getModels,
+};

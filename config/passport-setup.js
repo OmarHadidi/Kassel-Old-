@@ -1,13 +1,15 @@
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
+const { UserCreds, User } = require("../config").models;
+const bcrypt = require("bcrypt");
 
-const verifyUser = (username, password, done) => {
-    console.log("username :>> ", username);
-    console.log("password :>> ", password);
-
-    // TODO: vreify from DB
-    if (username == "omar" && password == "omar")
-        return done(null, { id:1 });
+const verifyUser = async (username, password, done) => {
+    const user = await UserCreds.findOne({
+        where: { username },
+    });
+    if (!user) return done(null, false);
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (isMatch) return done(null, user);
     done(null, false);
 };
 
@@ -16,14 +18,13 @@ const localStrategy = new LocalStrategy({}, verifyUser);
 const setupPassport = () => {
     passport.use(localStrategy);
     passport.serializeUser((user, done) => {
-        const {id} = user;
-        done(null, {userId: id});
+        const { UserId } = user;
+        done(null, UserId);
     });
-    passport.deserializeUser((id, done) => {
-        // TODO: get real data from DB
-        const user = {id, username: 'omar'};
+    passport.deserializeUser(async (id, done) => {
+        const user = await User.findByPk(id);
         done(null, user);
-    })
+    });
 };
 
 module.exports = {
