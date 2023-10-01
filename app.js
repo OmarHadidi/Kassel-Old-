@@ -30,6 +30,7 @@ app.use(
         secret: process.env.SESSION_SECRET,
         saveUninitialized: false,
         resave: false,
+        // TODO: use `connect-session-sequelize` to create a good store
     })
 );
 app.use(passport.initialize());
