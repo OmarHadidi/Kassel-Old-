@@ -5,15 +5,16 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 const session = require("express-session");
 const passport = require("passport");
+const flash = require('connect-flash');
 require("dotenv").config();
+
+const config = require('./config');
+const mw = require('./middlewares');
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var usersRouter = require("./routes/users");
 const authRouter = require('./routes/auth');
-const config = require('./config');
-
-const { setupPassport } = require("./config/passport-setup");
 
 var app = express();
 
@@ -26,6 +27,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(flash());
 app.use(
     session({
         secret: process.env.SESSION_SECRET,
@@ -36,8 +38,13 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
-setupPassport();
+config.passport.setupPassport();
 
+config.log.system('I am Here');
+// My middlewares
+app.use(mw.setFlash());
+
+// Routes
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/auth", authRouter);

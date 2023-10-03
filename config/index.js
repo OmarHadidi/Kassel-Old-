@@ -1,11 +1,14 @@
-const { Sequelize } = require("sequelize");
 require("dotenv").config();
 
-const { getModels } = require("../models");
-
-const sequelize = new Sequelize(process.env.DB_URI);
+const { sequelize, models } = require("./models-setup");
+const passportConf = require("./passport-setup");
+const log = require("./log");
+const errors = require("./errors");
 
 module.exports = {
-    sequelize: sequelize,
-    models: getModels(sequelize),
+    sequelize,
+    models,
+    passport: passportConf,
+    log,
+    errors,
 };
