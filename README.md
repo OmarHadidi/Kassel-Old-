@@ -1,0 +1,13 @@
+This Branch Can Be Reused As A Boilerplate, As It Has:
+-
+- **local auth** system using `passport.js`
+- **sessions** setup with sequelize (`connect-session-sequelize`)
+- **error handling**
+- **flash messages** middleware set up and ready to easy use
+- `config` directory
+- **models** defined and ready to be used from `config`
+- `middlewares` directory
+- `public` (static) directory + express-generator other things
+- `services` directory
+- `validation` directory and `Joi` + `Joi` signup validation schema
+- **errors.js** in `config` dir to be standard in the whole project
