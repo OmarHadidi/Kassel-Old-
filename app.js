@@ -5,17 +5,17 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 const session = require("express-session");
 const passport = require("passport");
-const flash = require('connect-flash');
-const cors = require('cors');
+const flash = require("connect-flash");
+const cors = require("cors");
 require("dotenv").config();
 
-const config = require('./config');
-const mw = require('./middlewares');
+const config = require("./config");
+const mw = require("./middlewares");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var usersRouter = require("./routes/users");
-const authRouter = require('./routes/auth');
+const authRouter = require("./routes/auth");
 
 var app = express();
 
@@ -35,18 +35,20 @@ app.use(
         secret: process.env.SESSION_SECRET,
         saveUninitialized: false,
         resave: false,
-        // cookie:{
-        //     sameSite: ""
-        // }
-        // TODO: use `connect-session-sequelize` to create a good store
-        
+        cookie: {
+            sameSite: "lax",
+            httpOnly: true,
+            secure: true,
+        },
+        store: config.sequelizeSessionStore,
+        proxy: true,
     })
 );
 app.use(passport.initialize());
 app.use(passport.session());
 config.passport.setupPassport();
 
-config.log.system('I am Here');
+config.log.system("I am Here");
 // My middlewares
 app.use(mw.setFlash());
 
@@ -62,6 +64,7 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
+    config.log.error(err);
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get("env") === "development" ? err : {};
