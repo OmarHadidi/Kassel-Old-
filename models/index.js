@@ -69,13 +69,11 @@ function setupModels(sequelize) {
 }
 
 /**
- * Defines Sequelize Models
+ * calls `sync()` after setting models and relations
  * @param {*} sequelize
- * @returns Asynchronously Returns all Models with relations applied between them
  */
 async function syncModels(sequelize) {
     setupModels(sequelize);
-    // await sequelize.sync({ force: true });
     await sequelize.sync();
 }
 
@@ -83,53 +81,9 @@ async function syncModels(sequelize) {
 const sequelize = new Sequelize(process.env.DB_URI);
 sequelize.authenticate().then(async () => {
     await syncModels(sequelize);
-    const User = sequelize.model("User");
-
-    // Managed Transaction
-    try {
-        await sequelize.transaction(async (t) => {
-            const u1 = await User.create(
-                { name: "test", email: "test@test.test" },
-                { transaction: t }
-            );
-            const u2 = await User.create(
-                { name: "test2", email: "test2" },
-                { transaction: t }
-            );
-        });
-    } catch (error) {
-        console.log(chalk.redBright("Error:"), "ROLLBACK");
-        console.log(chalk.redBright(error.name));
-        console.log(chalk.gray(error.message));
-    }
 });
-
-// (async function () {
-//     const sequelize = new Sequelize(process.env.DB_URI);
-//     await sequelize.authenticate();
-//     await syncModels(sequelize);
-
-//     const User = sequelize.model("User");
-
-//     // Managed Transaction
-//     try {
-//         await sequelize.transaction(async (t) => {
-//             const u1 = await User.create(
-//                 { name: "test", email: "test@test.test" },
-//                 { transaction: t }
-//             );
-//             const u2 = await User.create(
-//                 { name: "test2", email: "test2" },
-//                 { transaction: t }
-//             );
-//         })
-//     } catch (error) {
-//         console.log(chalk.redBright("Error:"),"ROLLBACK");
-//         console.log(chalk.redBright(error.name));
-//         console.log(chalk.gray(error.message));
-//     }
-// })();
 
 module.exports = {
     setupModels,
+    syncModels,
 };

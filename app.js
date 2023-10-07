@@ -6,6 +6,7 @@ var logger = require("morgan");
 const session = require("express-session");
 const passport = require("passport");
 const flash = require('connect-flash');
+const cors = require('cors');
 require("dotenv").config();
 
 const config = require('./config');
@@ -27,13 +28,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(cors());
 app.use(flash());
 app.use(
     session({
         secret: process.env.SESSION_SECRET,
         saveUninitialized: false,
         resave: false,
+        // cookie:{
+        //     sameSite: ""
+        // }
         // TODO: use `connect-session-sequelize` to create a good store
+        
     })
 );
 app.use(passport.initialize());

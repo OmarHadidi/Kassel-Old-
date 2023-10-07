@@ -1,35 +1,36 @@
 const { Sequelize, DataTypes, Op } = require("sequelize");
+const errors = require("../config/errors");
 
 /**
  * @param {Sequelize} sequelize
  */
 module.exports = function (sequelize) {
-    const User = require('./User.model')(sequelize);
-    
+    const User = require("./User.model")(sequelize);
+
     return sequelize.define("UserCreds", {
         username: {
-            type:DataTypes.STRING,
-            allowNull:false,
-            unique:true,
-            validate:{
-                notEmpty:true
-            }
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: { msg: errors.AlreadyExists("username") },
+            validate: {
+                notEmpty: { msg: errors.Missing("username") },
+            },
         },
         password: {
             type: DataTypes.STRING,
-            allowNull:false,
+            allowNull: false,
             validate: {
-                notEmpty: true
-            }
+                notEmpty: { msg: errors.Missing("password") },
+            },
         },
-        UserId:{
+        UserId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
                 model: User,
                 key: "id",
             },
-            primaryKey:true,
-        }
+            primaryKey: true,
+        },
     });
 };
